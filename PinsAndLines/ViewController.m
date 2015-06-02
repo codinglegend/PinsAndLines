@@ -18,8 +18,11 @@
 @property (nonatomic) MKPolyline *polyline;
 @property (nonatomic) CLLocationCoordinate2D destinationLocation;
 @property (nonatomic) MKPointAnnotation *point;
+@property (nonatomic) MKPointAnnotation *point2;
+@property (nonatomic) MKPolyline *line;
+//@property (nonatomic, assign) CLLocationCoordinate2D* points; // when it is not an object, add assign to make it more clear. also, an NSArray only contains objects (can't contain int, it would be an object...like NSNumber) so
 
-
+@property (nonatomic, strong) NSMutableArray* mutableArray;
 @end
 
 @implementation ViewController
@@ -42,20 +45,47 @@
     
     self.mapView.delegate = self; // because mapView is a property, we call self
     
-    CLLocationDegrees lat = 49.215000;
-    CLLocationDegrees lon = -123.108219;
-    self.destinationLocation = CLLocationCoordinate2DMake(lat, lon);
+// making pin #1
+ 
+// terrible way to do it:
+//    CLLocationDegrees lat = 49.215000;
+//    CLLocationDegrees lon = -123.108219;
+//    self.destinationLocation = CLLocationCoordinate2DMake(lat, lon);
+    self.destinationLocation = CLLocationCoordinate2DMake(49.215000, -123.108219);
     self.point = [MKPointAnnotation new];
     self.point.coordinate = self.destinationLocation;
     
-//    MKAnnotationView *view = [[MKAnnotationView alloc] initWithAnnotation:self.point reuseIdentifier:nil];
     [self.mapView addAnnotation:self.point];
+    
+// making pin #2
+    
+    CLLocationCoordinate2D startingLocation = CLLocationCoordinate2DMake(49.20000, -123.09);
+    self.point2 = [MKPointAnnotation new];
+    self.point2.coordinate = startingLocation;
+    [self.mapView addAnnotation:self.point2];
+    
+    CLLocationCoordinate2D ps[2] = {self.destinationLocation, startingLocation}; //no self dot for starting location since we did not make it a property
+    
+    self.line = [MKPolyline polylineWithCoordinates:ps count:2]; //remove [] on the array name
+    
+    [self.mapView addOverlay:self.line];
+    
 }
 
 -(MKAnnotationView *)mapView:(MKMapView *)mapView viewForAnnotation:(id<MKAnnotation>)annotation {
     
     return [[MKPinAnnotationView alloc] initWithAnnotation:self.point reuseIdentifier:nil];
 }
+
+- (MKOverlayRenderer *)mapView:(MKMapView *)mapView rendererForOverlay:(id <MKOverlay>)overlay{
+    
+    MKPolylineRenderer* renderer = [[MKPolylineRenderer alloc] initWithPolyline:self.line];
+    renderer.strokeColor = [UIColor redColor];
+    renderer.lineWidth = 5.0;
+    
+    return renderer;
+}
+
 
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
@@ -90,11 +120,7 @@ didChangeAuthorizationStatus:(CLAuthorizationStatus)status{
     
 }
 
-// from pinkstone code
-//- (MKOverlayView *)mapView:(MKMapView *)mapView viewForOverlay:(id<MKOverlay>)overlay {
-//    
-//    return self.lineView;
-//}
+
 
 
 
