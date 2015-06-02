@@ -74,7 +74,22 @@
 
 -(MKAnnotationView *)mapView:(MKMapView *)mapView viewForAnnotation:(id<MKAnnotation>)annotation {
     
-    return [[MKPinAnnotationView alloc] initWithAnnotation:self.point reuseIdentifier:nil];
+    
+    if ([annotation isKindOfClass:[MKUserLocation class]]) {
+        return nil;
+    }
+    
+    MKPinAnnotationView *pinView = [[MKPinAnnotationView alloc] initWithAnnotation:annotation reuseIdentifier:nil];
+    
+    
+//    NSLog(@"MapView is asking for a view for %@", annotation);
+//    
+//    if (NO) {
+//        [pinView setPinColor:MKPinAnnotationColorRed];
+//    }
+    
+    
+    return pinView;
 }
 
 - (MKOverlayRenderer *)mapView:(MKMapView *)mapView rendererForOverlay:(id <MKOverlay>)overlay{
@@ -110,6 +125,8 @@
         initialLocationSet = true;
     
     }
+    
+    // here is where you want to save the user's location
 }
 
 - (void)locationManager:(CLLocationManager *)manager
