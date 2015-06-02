@@ -36,8 +36,8 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     // Do any additional setup after loading the view, typically from a nib.
-    initialLocationSet = false;
-    
+//    initialLocationSet = false;
+//    
     self.locationManager = [[CLLocationManager alloc] init];
     self.locationManager.delegate = self;
     [self.locationManager requestWhenInUseAuthorization];
@@ -75,15 +75,21 @@
 -(MKAnnotationView *)mapView:(MKMapView *)mapView viewForAnnotation:(id<MKAnnotation>)annotation {
     
     
-    if ([annotation isKindOfClass:[MKUserLocation class]]) {
-        return nil;
+    if ([annotation isKindOfClass:[MKUserLocation class]]) { // how to ask if something is of a certain class
+        
+        MKPinAnnotationView *pinViewStart = [[MKPinAnnotationView alloc] initWithAnnotation:annotation reuseIdentifier:nil];
+        
+        [pinViewStart setPinColor:MKPinAnnotationColorGreen];
+        
+        return pinViewStart;
+//        return nil; if you want the blue dot
     }
     
     MKPinAnnotationView *pinView = [[MKPinAnnotationView alloc] initWithAnnotation:annotation reuseIdentifier:nil];
     
     
 //    NSLog(@"MapView is asking for a view for %@", annotation);
-//    
+//
 //    if (NO) {
 //        [pinView setPinColor:MKPinAnnotationColorRed];
 //    }
