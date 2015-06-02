@@ -13,5 +13,8 @@
 
 @property (weak, nonatomic) IBOutlet MKMapView *mapView;
 
+- (instancetype)initWithAnnotation:(id<MKAnnotation>)annotation
+                   reuseIdentifier:(NSString *)reuseIdentifier;
+
 @end
 
