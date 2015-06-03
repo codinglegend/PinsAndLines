@@ -20,9 +20,9 @@
 @property (nonatomic) MKPointAnnotation *point;
 @property (nonatomic) MKPointAnnotation *point2;
 @property (nonatomic) MKPolyline *line;
+@property (nonatomic) NSMutableArray *locationArray;
 //@property (nonatomic, assign) CLLocationCoordinate2D* points; // when it is not an object, add assign to make it more clear. also, an NSArray only contains objects (can't contain int, it would be an object...like NSNumber) so
 
-@property (nonatomic, strong) NSMutableArray* mutableArray;
 @end
 
 @implementation ViewController
@@ -37,6 +37,9 @@
     [super viewDidLoad];
     // Do any additional setup after loading the view, typically from a nib.
 //    initialLocationSet = false;
+    
+    self.locationArray = [[NSMutableArray alloc] init];
+    
 //    
     self.locationManager = [[CLLocationManager alloc] init];
     self.locationManager.delegate = self;
@@ -87,14 +90,8 @@
     
     MKPinAnnotationView *pinView = [[MKPinAnnotationView alloc] initWithAnnotation:annotation reuseIdentifier:nil];
     
-    
 //    NSLog(@"MapView is asking for a view for %@", annotation);
-//
-//    if (NO) {
-//        [pinView setPinColor:MKPinAnnotationColorRed];
-//    }
-    
-    
+
     return pinView;
 }
 
@@ -115,7 +112,7 @@
 
 - (void)locationManager:(CLLocationManager *)manager didUpdateLocations:(NSArray *)locations{
     
-    CLLocation *location = [locations firstObject];
+    CLLocation *location = [locations lastObject];
     
     if (!initialLocationSet){
         
@@ -129,10 +126,19 @@
         //This is still valid but won't zoom in
         //[self.mapView setCenterCoordinate:location.coordinate];
         initialLocationSet = true;
+        
     
     }
     
-    // here is where you want to save the user's location
+    // check if point is too close to last point.
+    
+    [self.locationArray addObject:location];
+    
+    
+    [self updateMap];
+    
+    NSLog(@"locationArray %@", self.locationArray);
+    // here is where you want to save the user's location or add it to an array
 }
 
 - (void)locationManager:(CLLocationManager *)manager
@@ -141,6 +147,31 @@ didChangeAuthorizationStatus:(CLAuthorizationStatus)status{
     // if given authorization
     //[_locationManager startUpdatingLocation];
     
+}
+
+
+-(void)updateMap{
+    
+    CLLocationCoordinate2D *coordinateArray
+    = malloc(sizeof(CLLocationCoordinate2D) * self.locationArray.count);
+    
+    int caIndex = 0;
+    for (CLLocation *loc in self.locationArray) {
+        coordinateArray[caIndex] = loc.coordinate;
+        caIndex++;
+    }
+    
+    MKPolyline *lines = [MKPolyline polylineWithCoordinates:coordinateArray
+                                                      count:self.locationArray.count];
+    
+    [self.mapView removeOverlay:self.line];
+    self.line = lines;
+    
+    free(coordinateArray);
+    
+    
+
+    [self.mapView addOverlay:lines];
 }
 
 
